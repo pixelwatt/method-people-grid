@@ -371,6 +371,7 @@ function method_people_grid_register_peoplegroup_metabox() {
 			'title'         => esc_html__( 'Group Options', 'method-people-grid' ),
 			'object_types'     => array( 'term' ), // Tells CMB2 to use term_meta vs post_meta
 			'taxonomies'       => array( 'method_peoplegroups' ), // Tells CMB2 which taxonomies should have these fields
+			'new_term_section' => false,
 		)
 	);
 	$cmb_options->add_field(
@@ -379,7 +380,7 @@ function method_people_grid_register_peoplegroup_metabox() {
             //'desc'     => __( '(Optional) Provide a title for this person.', 'method-people-grid' ),
             'id'   => '_method_peoplegroup_shortcode',
             'type'     => 'text',
-            'default_cb' => 'method_people_grid_display_shortcode_in_admin',
+            'default_cb' => 'method_people_grid_default_shortcode_in_admin',
             'display_cb' => 'method_people_grid_display_shortcode_in_admin',
             'attributes' => array(
                 'disabled' => 'disabled',
@@ -397,6 +398,10 @@ function method_people_grid_register_peoplegroup_metabox() {
 
 function method_people_grid_display_shortcode_in_admin( $field_args, $field ) {
 	return '[peoplegroup id="' . $field_args['render_row_cb'][0]->object_id . '"] ' . method_people_grid_get_tags_badge();
+}
+
+function method_people_grid_default_shortcode_in_admin( $field_args, $field ) {
+	return '[peoplegroup id="' . $field_args['render_row_cb'][0]->object_id . '"]';
 }
 
 

@@ -107,12 +107,12 @@ function method_people_grid_post_type_init() {
 	$args = array(
 		'labels'             => $labels,
 		'description'        => __( 'A description for the post type.', 'method-people-grid' ),
-		'public'             => true,
-		'publicly_queryable' => true,
+		'public'             => false,
+		'publicly_queryable' => false,
 		'show_ui'            => true,
-		'query_var'          => true,
+		'query_var'          => false,
 		'capability_type'    => 'post',
-		'has_archive'        => true,
+		'has_archive'        => false,
 		'hierarchical'       => false,
 		'menu_position' 	 => 5,
 		'menu_icon'			 => 'dashicons-megaphone',
@@ -145,10 +145,11 @@ function method_people_grid_taxonomy_init() {
 
 	register_taxonomy('method_peoplegroups',array('method_people'), array(
 		'hierarchical' => true,
+		'public' => false,
 		'labels' => $labels,
 		'show_ui' => true,
 		'query_var' => true,
-		'rewrite' => array( 'slug' => 'mytax' ),
+		'archive' => false,
 		'show_admin_column' => true
 	));
 }

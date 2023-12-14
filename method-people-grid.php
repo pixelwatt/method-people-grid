@@ -3,7 +3,7 @@
  * Plugin Name: Method People Grid
  * Plugin URI: https://github.com/pixelwatt/method-people-grid
  * Description: This plugin adds a versitile shortcode for displaying grids of people, with AJAX-powered modals.
- * Version: 0.9.0
+ * Version: 0.9.1
  * Author: Rob Clark
  * Author URI: https://robclark.io
  */
@@ -15,7 +15,7 @@ require_once('class-method-people-grid-utility.php');
 // Register frontend stylesheets and scripts
 
 function method_people_grid_enqueue_frontend_dependencies() {
-    wp_enqueue_style( 'method-people-grid', plugin_dir_url( __FILE__ ) . 'assets/css/method-people-grid.css', '', '0.9.0' );
+    wp_enqueue_style( 'method-people-grid', plugin_dir_url( __FILE__ ) . 'assets/css/method-people-grid.css', '', '0.9.1' );
 }
 
 add_action( 'wp_enqueue_scripts', 'method_people_grid_enqueue_frontend_dependencies' );
@@ -27,7 +27,7 @@ function method_people_grid_enqueue_backend_dependencies() {
 	$wp_scripts = wp_scripts();
 	wp_enqueue_script( 'jquery-ui-dialog' );
     wp_enqueue_style( 'jquery-ui', 'https://ajax.googleapis.com/ajax/libs/jqueryui/' . $wp_scripts->registered['jquery-ui-core']->ver . '/themes/smoothness/jquery-ui.css', '', '', false );
-    wp_enqueue_style( 'method-people-grid-admin', plugin_dir_url( __FILE__ ) . '/assets/css/admin-styles.css', '', '0.9.0' );
+    wp_enqueue_style( 'method-people-grid-admin', plugin_dir_url( __FILE__ ) . '/assets/css/admin-styles.css', '', '0.9.1' );
 }
 
 add_action( 'admin_enqueue_scripts', 'method_people_grid_enqueue_backend_dependencies' );
@@ -167,6 +167,8 @@ function method_people_grid_add_shortcode( $atts, $content, $shortcode_tag ) {
 		'headline' => '',
 		'htag' => $layout->get_option( 'shortcode_htag', 'h2' ),
 		'modals' => ( 'yes' == $layout->get_option( 'shortcode_modals', 'yes' ) ? true : false ),
+		'spacing' => $layout->get_option( 'grid_spacing', '3' ),
+		'people_per_row' => $layout->get_option( 'people_per_row', '4' ),
 	), $atts, 'peoplegroup' );
 
 	if ( ! empty ( $atts['id'] ) ) {
@@ -188,14 +190,29 @@ function method_people_grid_add_shortcode( $atts, $content, $shortcode_tag ) {
 		if ( $items ) {
 			if ( is_array( $items ) ) {
 				if ( 0 < count( $items ) ) {
-					$shou = '<div class="method-peoplegroup-grid"><div class="row">';
+					$col_classes = '';
+					switch ( $atts['people_per_row'] ) {
+						case '1':
+							$col_classes = 'col-' . $cols;
+							break;
+						case '2':
+							$col_classes = 'col-' . $cols . ' col-md-' . ( $cols / 2 ) . ' col-lg-' . ( $cols / 2 );
+							break;
+						case '3':
+							$col_classes = 'col-' . $cols . ' col-md-' . ( $cols / 3 ) . ' col-lg-' . ( $cols / 3 );
+							break;
+						case '4':
+							$col_classes = 'col-' . $cols . ' col-md-' . ( $cols / 3 ) . ' col-lg-' . ( $cols / 4 );
+							break;
+					}
+					$shou = '<div class="method-peoplegroup-grid"><div class="row g-' . $atts['spacing'] . '">';
 					if ( ! empty( $atts['headline'] ) ) {
 						$shou .= '<div class="method-peoplegroup-grid-headline"><' . $atts['htag'] . '>' . $atts['headline'] . '</' . $atts['htag'] . '></div>';
 					}
 					foreach ( $items as $item ) {
 						$layout->load_meta( $item );
 						$shou .= '
-							<div class="col-' . $cols . ' col-md-' . ( $cols / 3 ) . ' col-lg-' . ( $cols / 4 ) . '">
+							<div class="' . $col_classes . '">
 								<div class="method-peoplegroup-item method-peoplegroup-item-group-' . $randID . '"' . ( true === $atts['modals'] ? ' data-bs-toggle="modal" data-bs-target="#methodPersonModal' . $randID . '" data-person="' . $item . '"' : '' ) . '>
 									<div class="method-peoplegroup-item-photo method-fit-img-container">
 										' . ( has_post_thumbnail( $item ) ? get_the_post_thumbnail( $item, 'large', array( 'class' => 'method-fit-img' ) ) : '' ) . '
@@ -449,6 +466,34 @@ function method_people_grid_register_plugin_options() {
             '24'   => __( '24 Columns', 'method-people-grid' ),
         ),
         'default' => '12',
+    ) );
+	$cmb_options->add_field( array(
+        'name'    => 'People Per Row',
+        'id'      => 'people_per_row',
+        'type'    => 'radio_inline',
+        'desc'    => 'How many people should be displayed per row on desktop?',
+        'options' => array(
+            '1' => __( '1', 'method-people-grid' ),
+            '2'   => __( '2', 'method-people-grid' ),
+			'3'   => __( '3', 'method-people-grid' ),
+			'4'   => __( '4', 'method-people-grid' ),
+        ),
+        'default' => '4',
+    ) );
+	$cmb_options->add_field( array(
+        'name'    => 'Grid Spacing',
+        'id'      => 'grid_spacing',
+        'type'    => 'radio_inline',
+        'desc'    => 'Choose the level of grid spacing to use, with 0 being no spacing, and 5 being the most spacing.',
+        'options' => array(
+			'0' => __( '0', 'method-people-grid' ),
+            '1' => __( '1', 'method-people-grid' ),
+            '2'   => __( '2', 'method-people-grid' ),
+			'3'   => __( '3', 'method-people-grid' ),
+			'4'   => __( '4', 'method-people-grid' ),
+			'5' => __( '5', 'method-people-grid' ),
+        ),
+        'default' => '3',
     ) );
     $cmb_options->add_field(
 		array(

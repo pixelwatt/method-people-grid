@@ -3,7 +3,7 @@
  * Plugin Name: Method People Grid
  * Plugin URI: https://github.com/pixelwatt/method-people-grid
  * Description: This plugin adds a versitile shortcode for displaying grids of people, with AJAX-powered modals.
- * Version: 0.9.2
+ * Version: 0.9.3
  * Author: Rob Clark
  * Author URI: https://robclark.io
  */
@@ -390,6 +390,7 @@ function method_people_grid_build_modal() {
 				if ( ( $layout->get_loaded_meta( '_method_people_title' ) ) || ( $layout->get_loaded_meta( '_method_people_org' ) ) ) {
 					$output .= '<p class="method-peoplegroup-item-org">' . $layout->get_loaded_headline( '_method_people_title', '', '' ) . ( $layout->get_loaded_meta( '_method_people_title' ) ? ( $layout->get_loaded_meta( '_method_people_org' ) ? ', <br>' : '' ) : '' ) . $layout->get_loaded_headline( '_method_people_org', '', '' ) . '</p>';
 				}
+				$output .= method_people_grid_build_social_icons( 'method-people-group-social', 24, $layout->get_serialized_loaded_meta( '_method_people_social_accounts' ) );
 				$output .= '
 									
 								</div>
